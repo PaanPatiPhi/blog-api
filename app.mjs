@@ -1,12 +1,23 @@
 import express from "express";
 import "dotenv/config";
 import connectionPool from "./utils/db.mjs";
+import cors from "cors";
 
 
 const app = express();
-const port = 4002;
+const port = process.env.PORT || 4002;
 app.use(express.json());
 
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // Frontend local (Vite)
+      "http://localhost:3000", // Frontend local (React แบบอื่น)
+      "https://personal-blog-react-32p2.app", // Frontend ที่ Deploy แล้ว
+      // ✅ ให้เปลี่ยน https://your-frontend.vercel.app เป็น URL จริงของ Frontend ที่ deploy แล้ว
+    ],
+  })
+);
 
 app.get("/test", (req,res)=>{
     return res.json({message:"Server API IS working"});
@@ -54,6 +65,9 @@ app.post("/posts", async (req, res) => {
   }
 });
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ message: "OK" });
+});
 
 
 app.listen(port, () => {
