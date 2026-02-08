@@ -63,20 +63,31 @@ app.get("/health", (req, res) => {
   res.status(200).json({ message: "OK" });
 });
 
-app.get("/api/posts", async (req,res)=>{
-  try{
-    const results = await connectionPool.query(`SELECT * FROM posts`);
-    res.status(200).json({
-      data: results.rows
-    })
+// app.get("/api/posts", async (req,res)=>{
+//   try{
+//     const results = await connectionPool.query(`SELECT * FROM posts`);
+//     res.status(200).json({
+//       data: results.rows
+//     })
+//   }
+//   catch(error){
+//     console.log(error)
+//     res.status(500).json({
+//       message: "Server could not fetch posts"
+//     })
+//   }
+// })
+
+app.get("/posts", async (req, res) => {
+  try {
+    console.log("DATABASE_URL:", process.env.DATABASE_URL);
+    const results = await connectionPool.query("SELECT 1");
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
-  catch(error){
-    console.log(error)
-    res.status(500).json({
-      message: "Server could not fetch posts"
-    })
-  }
-})
+});
 
 
 
