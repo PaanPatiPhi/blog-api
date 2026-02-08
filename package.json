@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "dev": "nodemon /api/index.mjs"
+    "dev": "node api/index.mjs"
   },
   "keywords": [],
   "author": "",
