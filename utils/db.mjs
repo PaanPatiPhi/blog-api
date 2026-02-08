@@ -1,6 +1,5 @@
 // Create PostgreSQL Connection Pool here !
-import * as pg from "pg";
-const { Pool } = pg.default;
+import { Pool } from "pg";
 
 const connectionPool = new Pool({
   connectionString:
