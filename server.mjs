@@ -1,4 +1,4 @@
-import app from "./api/index.js";
+import app from "./api/index.mjs";
 
 const port = process.env.PORT || 4002;
 app.listen(port, () => {
