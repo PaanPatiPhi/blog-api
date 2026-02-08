@@ -14,6 +14,7 @@ app.use(
       "http://localhost:5173", // Frontend local (Vite)
       "http://localhost:3000", // Frontend local (React แบบอื่น)
       "https://personal-blog-react-32p2.app", // Frontend ที่ Deploy แล้ว
+      "https://personal-blog-react-32p2-git-dev-phis-projects-e10d8e3b.vercel.app/",
     ],
     methods:["GET","POST","PUT","PATCH","DELETE","OPTIONS"]
   })
