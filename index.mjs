@@ -63,7 +63,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({ message: "OK" });
 });
 
-app.get("/posts", async (req,res)=>{
+app.get("/api/posts", async (req,res)=>{
   try{
     const results = await connectionPool.query(`SELECT * FROM posts`);
     res.status(200).json({
