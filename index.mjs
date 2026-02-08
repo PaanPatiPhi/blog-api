@@ -75,6 +75,7 @@ app.get("/api/posts", async (req,res)=>{
     res.status(500).json({
       message: "Server could not fetch posts"
     })
+    
   }
 })
 
