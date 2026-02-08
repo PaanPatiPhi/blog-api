@@ -4,8 +4,8 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "dev": "node index.mjs",
-    "start": "nodemon index.mjs"
+    "dev": "node server.mjs",
+    "start": "nodemon server.mjs"
   },
   "keywords": [],
   "author": "",
