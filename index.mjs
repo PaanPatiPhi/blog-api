@@ -80,7 +80,7 @@ app.get("/health", (req, res) => {
 
 app.get("/posts", async (req, res) => {
   try {
-    console.log("CONNECTION_STRING:", process.env.CONNECTION_STRING);
+    console.log("DATABASE_URL:", process.env.DATABASE_URL);
     const results = await connectionPool.query("SELECT 1");
     res.json({ ok: true });
   } catch (err) {
