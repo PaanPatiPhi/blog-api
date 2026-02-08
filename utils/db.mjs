@@ -7,5 +7,5 @@ const connectionPool = new Pool({
     rejectUnauthorized: false, // Supabase ต้องการ SSL
   },
 });
-
+console.log("CONNECTION_STRING:", process.env.CONNECTION_STRING);
 export default connectionPool;
