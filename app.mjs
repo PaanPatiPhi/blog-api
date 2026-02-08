@@ -14,8 +14,8 @@ app.use(
       "http://localhost:5173", // Frontend local (Vite)
       "http://localhost:3000", // Frontend local (React แบบอื่น)
       "https://personal-blog-react-32p2.app", // Frontend ที่ Deploy แล้ว
-      // ✅ ให้เปลี่ยน https://your-frontend.vercel.app เป็น URL จริงของ Frontend ที่ deploy แล้ว
     ],
+    methods:["GET","POST","PUT","PATCH","DELETE","OPTIONS"]
   })
 );
 
@@ -68,6 +68,22 @@ app.post("/posts", async (req, res) => {
 app.get("/health", (req, res) => {
   res.status(200).json({ message: "OK" });
 });
+
+app.get("/posts", async (req,res)=>{
+  try{
+    const results = await connectionPool.query(`SELECT * FROM posts`);
+    res.status(200).json({
+      data: results.rows
+    })
+  }
+  catch(error){
+    console.log(error)
+    res.status(500).json({
+      message: "Server could not fetch posts"
+    })
+  }
+})
+
 
 
 app.listen(port, () => {
