@@ -1,6 +1,6 @@
 import express from "express";
 import "dotenv/config";
-import connectionPool from "../utils/db.mjs";
+import connectionPool from "./utils/db.mjs";
 import cors from "cors";
 
 
@@ -9,15 +9,8 @@ const port = process.env.PORT || 4002;
 app.use(express.json());
 
 app.use(
-  cors({
-    origin: [
-      "http://localhost:5173", // Frontend local (Vite)
-      "http://localhost:3000", // Frontend local (React แบบอื่น)
-      "https://personal-blog-react-32p2.app", // Frontend ที่ Deploy แล้ว
-      "https://personal-blog-react-32p2-git-dev-phis-projects-e10d8e3b.vercel.app",
-    ],
-    methods:["GET","POST","PUT","PATCH","DELETE","OPTIONS"]
-  })
+cors({ origin: "*" })
+
 );
 
 app.get("/test", (req,res)=>{
