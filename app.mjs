@@ -11,6 +11,7 @@ import commentRouter from "./routes/commentRouter.js";
 import notificationRouter from "./routes/notificationRouter.js";
 import likeRouter from "./routes/likeRouter.js";
 import userRouter from "./routes/userRouter.js";
+import testRouter from "./routes/testRouter.js";
 
 const app = express();
 app.use(cors({
@@ -32,6 +33,7 @@ app.use("/comments", commentRouter);
 app.use("/notifications", notificationRouter);
 app.use("/likes", likeRouter);
 app.use("/users", userRouter);
+app.use("/test", testRouter);
 
 
 app.get("/test", (req,res)=>{
