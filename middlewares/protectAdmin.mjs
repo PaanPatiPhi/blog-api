@@ -1,11 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import connectionPool from "../utils/db.mjs";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
-
 const protectAdmin = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   
@@ -21,6 +16,30 @@ const protectAdmin = async (req, res, next) => {
   console.log("Admin auth - Token preview:", token.substring(0, 20) + "...");
   
   try {
+    // Check environment variables
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+      console.error("Missing Supabase environment variables");
+      return res.status(500).json({ 
+        error: "Server configuration error",
+        details: "Supabase configuration missing"
+      });
+    }
+
+    console.log("Supabase URL:", process.env.SUPABASE_URL);
+    console.log("Supabase Key present:", !!process.env.SUPABASE_ANON_KEY);
+
+    // Create Supabase client inside the function
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_ANON_KEY,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    );
+
     // Verify token with Supabase
     const { data, error } = await supabase.auth.getUser(token);
     
@@ -30,11 +49,19 @@ const protectAdmin = async (req, res, next) => {
       hasUser: !!data?.user 
     });
     
-    if (error || !data.user) {
-      console.error("Admin auth error:", error);
+    if (error) {
+      console.error("Admin auth - Supabase error:", error);
       return res.status(401).json({ 
         error: "Unauthorized: Invalid token",
-        details: error?.message || "No user found"
+        details: error.message || "Token validation failed"
+      });
+    }
+
+    if (!data.user) {
+      console.log("Admin auth - No user found in token");
+      return res.status(401).json({ 
+        error: "Unauthorized: Invalid token",
+        details: "No user found in token"
       });
     }
 
@@ -78,6 +105,15 @@ const protectAdmin = async (req, res, next) => {
     next();
   } catch (err) {
     console.error("Admin middleware error:", err);
+    
+    // Check if it's a fetch error (network/connectivity issue)
+    if (err.message && err.message.includes('fetch')) {
+      return res.status(500).json({ 
+        error: "Server configuration error",
+        details: "Cannot connect to Supabase. Check environment variables."
+      });
+    }
+    
     res.status(500).json({ error: "Internal server error" });
   }
 };

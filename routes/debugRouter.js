@@ -3,6 +3,16 @@ import { createClient } from "@supabase/supabase-js";
 
 const debugRouter = Router();
 
+// Check environment variables
+debugRouter.get("/env", async (req, res) => {
+  return res.status(200).json({
+    supabaseUrl: process.env.SUPABASE_URL ? "Set" : "Missing",
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY ? "Set" : "Missing",
+    databaseUrl: process.env.DATABASE_URL ? "Set" : "Missing",
+    port: process.env.PORT || "Not set"
+  });
+});
+
 // Debug endpoint to check token format
 debugRouter.post("/token", async (req, res) => {
   const { token } = req.body;
@@ -15,7 +25,13 @@ debugRouter.post("/token", async (req, res) => {
 
   const supabase = createClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY
+    process.env.SUPABASE_ANON_KEY,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
   );
 
   try {
