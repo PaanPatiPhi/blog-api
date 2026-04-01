@@ -2,16 +2,33 @@ import express from "express";
 import "dotenv/config";
 import connectionPool from "./utils/db.mjs";
 import cors from "cors";
-
+import authRouter from "./routes/auth.js";
+import postRouter from "./routes/postRouter.js";
+import meRouter from "./routes/me.js";
+import categoryRouter from "./routes/categoryRouter.js";
+import adminRouter from "./routes/adminRouter.js";
+import commentRouter from "./routes/commentRouter.js";
+import notificationRouter from "./routes/notificationRouter.js";
+import likeRouter from "./routes/likeRouter.js";
+import userRouter from "./routes/userRouter.js";
 
 const app = express();
+app.use(cors({
+  origin: "http://localhost:5173",
+}));
+
 const port = process.env.PORT || 4002;
 app.use(express.json());
+app.use("/auth", authRouter)
+app.use("/posts", postRouter)
+app.use("/me", meRouter)
+app.use("/categories", categoryRouter)
+app.use("/admin", adminRouter);
+app.use("/comments", commentRouter);
+app.use("/notifications", notificationRouter);
+app.use("/likes", likeRouter);
+app.use("/users", userRouter);
 
-app.use(
-cors({ origin: "*" })
-
-);
 
 app.get("/test", (req,res)=>{
     return res.json({message:"Server API IS working"});
@@ -26,38 +43,7 @@ app.get("/profiles", (req, res) => {
   });
 });
 
-app.post("/posts", async (req, res) => {
-  try{
-     const { title,image,category_id,description, content, status_id } = req.body;
-    if (!title || !image || !category_id || !description || !content || !status_id) {
-      return res.status(400).json({
-        message: "Server could not create assignment because there are missing data from client" 
-      });
-    }
-   const newPost = {
-     ...req.body,
-   };
-   await connectionPool.query(
-     `INSERT INTO posts ( title,image,category_id,description, content, status_id)
-	   VALUES ($1, $2, $3, $4, $5, $6)`,
-     [
-       newPost.title,
-       newPost.image,
-       newPost.category_id,
-       newPost.description,
-       newPost.content,
-       newPost.status_id,
-     ]
-   );
-   return res.status(201).json({
-     message: "Created post successfully",
-   });
-  }
-  catch(error){
-    console.log(error)
-    return res.status(500).json({ message: "Server could not create assignment because database connection" });
-  }
-});
+
 
 app.get("/health", (req, res) => {
   res.status(200).json({ message: "OK" });
@@ -65,7 +51,7 @@ app.get("/health", (req, res) => {
 
 app.get("/api/posts", async (req,res)=>{
   try{
-    const results = await connectionPool.query(`SELECT * FROM posts`);
+    const results = await connectionPool.query(`SELECT * FROM posts where status_id = '2'`);
     res.status(200).json({
       data: results.rows
     })
@@ -77,15 +63,50 @@ app.get("/api/posts", async (req,res)=>{
     })
   }
 })
-
-app.get("/posts", async (req, res) => {
+app.get("/published", async (req, res) => {
   try {
-    console.log("CONNECTION_STRING:", process.env.CONNECTION_STRING);
-    const results = await connectionPool.query("SELECT 1");
-    res.json({ ok: true });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 6));
+
+    const offset = (page - 1) * limit;
+
+    // ✅ นับเฉพาะ published
+    const countResult = await connectionPool.query(
+      `SELECT COUNT(*) FROM posts WHERE status_id = '2'`
+    );
+
+    const totalPosts = Number(countResult.rows[0].count);
+    const totalPages = Math.ceil(totalPosts / limit);
+
+    const postsResult = await connectionPool.query(
+      `
+      SELECT *
+      FROM posts
+      WHERE status_id = '2'
+      ORDER BY id DESC
+      LIMIT $1 OFFSET $2
+      `,
+      [limit, offset]
+    );
+
+    const posts = postsResult.rows;
+
+    const nextPage = page < totalPages ? page + 1 : null;
+
+    res.json({
+      totalPosts,
+      totalPages,
+      currentPage: page,
+      limit,
+      posts,
+      nextPage,
+    });
+  } catch (error) {
+    console.log(error)
+
+    // res.status(500).json({
+    //   message: "Internal server error",
+    // });
   }
 });
 
