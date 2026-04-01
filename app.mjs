@@ -14,7 +14,11 @@ import userRouter from "./routes/userRouter.js";
 
 const app = express();
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: [
+    "http://localhost:5173",
+    "https://personal-blog-react-git-refactor-d99b7b-phis-projects-e10d8e3b.vercel.app",
+    "https://personal-blog-react-cyan.vercel.app"
+  ]
 }));
 
 const port = process.env.PORT || 4002;
