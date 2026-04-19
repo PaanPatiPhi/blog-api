@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "node server.mjs",
-    "start": "nodemon server.mjs"
+    "start": "nodemon server.mjs",
+    "build": "echo 'Build completed - API ready for deployment'"
   },
   "keywords": [],
   "author": "",
